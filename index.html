@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Pattern</title>
+</head>
+<body>
+	<script>
+
+			// Домашка № 22 16.04.2020 Patterns
+
+			class Publisher{
+				constructor(option){
+					this.option = option;
+					this.subscribers= [];
+				}
+				addSubscriber(){
+					for(let i=0;i<arguments.length;i++){
+						this.subscribers.push(arguments[i]);
+					}
+					return this.subscribers;
+				}
+				removeSubscriber(follower){
+					const remFollwer = this.subscribers.indexOf(follower);
+					this.subscribers.splice(remFollwer,1);
+				}
+				notifySubscriber(){
+					this.subscribers.forEach(item=>item.update());
+				}
+			}
+
+			class Followers {
+				constructor(option){
+					this.option = option;
+				}
+				update(){
+					console.log(`Hello, I like that you join us ${this.option}`);
+				}
+			}
+
+			const publisher = new Publisher('Издатель');
+
+			const fol1 = new Followers('Igor');
+			const fol2 = new Followers('Vlad');
+			const fol3 = new Followers('Pety');
+
+			class Buttons extends Publisher{
+				constructor(){
+					super();
+				}
+				addBtns(){
+					const btns =publisher.addSubscriber(fol1,fol2,fol3);
+					btns.forEach((item,index)=>{
+						const btn = document.createElement('button');
+						btn.innerHTML = index;
+						document.body.append(btn);
+						btn.style = `width:30px; height:30px; margin:10px; cursor : pointer ; font-size:22px; color:red;`;
+						btn.addEventListener('click',()=>{
+							if(index === 0){
+								btngrup.addModal();
+							}
+							else if(index === 1){
+								btngrup.logger();
+							}
+							else{
+								btngrup.addFetch();
+							}
+						})
+					})
+				}
+				addModal(){
+					const container = document.createElement('div');
+					const modalBaground = document.createElement('div');
+					modalBaground.style =`width: 100%; height: 100%; background: #111111ee ; position:fixed; top:0; left:0; right:0; bottom:0; z-index:100;`; 
+
+					const modalWindow = document.createElement('div');
+					modalWindow.style = `width : 100%; max-width:300px; height:150px; background: rgb(66, 245, 239); margin:20px auto; border-radius:10%;`
+					const text = document.createElement('p');
+					text.innerHTML = `Нажми чтобы закрыть`;
+					text.id = 'close';
+					text.style = `font-size:22px; font-family:Arial; font-weight:bold; text-align:center; line-height:150px; cursor:pointer; height:20px`
+					
+					document.body.append(container);
+					container.append(modalBaground);
+					modalBaground.append(modalWindow);
+					modalWindow.append(text);
+
+					const p = document.getElementById('close');
+					p.addEventListener('click',()=>{
+						container.remove(modalBaground);		
+					})
+				}
+				addFetch(){
+					const promis = fetch('https://api.github.com/users')
+					.then(resolve=>resolve.json())
+					.then(result=> users(result));
+
+					function users(result){
+						const Link = document.createElement('a');
+						Link.textContent = 'Закрыть';
+						Link.style = `cursor:pointer; font-size:20px; text-transform: uppercase;`
+						result.forEach(item=>{
+							const container = document.createElement('div');
+							document.body.prepend(container);
+							container.append(Link);
+							const List = document.createElement('ul');
+							const li = document.createElement('li');
+							const IMG = document.createElement('img');
+							IMG.src = item.avatar_url ;
+							IMG.style = `width:100px; height:100px; display:block;`
+							li.innerHTML = item.login ;
+							container.append(List);
+							List.append(li);
+							li.append(IMG);
+
+							const a = document.querySelector('a');
+							a.addEventListener('click',()=>{
+								container.remove(List);
+							})
+						})
+					}
+				}
+				logger(){
+					publisher.notifySubscriber();
+				}
+			}
+			const btngrup = new Buttons();
+			btngrup.addBtns();
+
+		</script>
+
+	</body>
+	</html>
